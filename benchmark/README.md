@@ -174,15 +174,10 @@ python3 -m benchmark.human_alignment.export_annotations \
 # 2. Human raters fill the generated CSV template:
 # benchmark/data/bench_pipeline/human_alignment_pairwise/annotation_template.csv
 
-# 3. Summarize human-vs-LLM alignment
-python3 -m benchmark.human_alignment.summarize_annotations \
+# 3. Run live LLM judge through the existing LLM config and plot preference alignment
+python3 -m benchmark.human_alignment.plot_alignment \
   --annotations benchmark/data/bench_pipeline/human_alignment_pairwise/completed_annotations.csv \
   --key benchmark/data/bench_pipeline/human_alignment_pairwise/annotation_key.json \
-  --tie-threshold 0.25
-
-# 4. Plot preference alignment
-python3 -m benchmark.human_alignment.plot_alignment \
-  --summary benchmark/data/bench_pipeline/human_alignment_pairwise/human_alignment_summary.json \
   --output benchmark/data/bench_pipeline/human_alignment_pairwise/human_alignment_preference_alignment.svg
 ```
 
@@ -192,6 +187,7 @@ Outputs:
 - `annotation_template.csv`: required human preference schema
 - `review_ui.html`: browser-based scoring UI; open it and load `annotation_package.jsonl`
 - `annotation_key.json`: private mapping from annotation IDs to backend/eval files
+- `live_llm_judgments.json`: live LLM A/B/tie preferences and brief rationales
 - `human_alignment_summary.json/.md`: per-metric DeepTutor preference rates,
   LLM preference rates, agreement, kappa, tie rates, and inter-rater agreement
 - `human_alignment_preference_alignment.svg`: stacked human-vs-LLM preference plot

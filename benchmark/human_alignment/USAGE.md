@@ -202,23 +202,72 @@ human_alignment_summary.json
 human_alignment_summary.md
 ```
 
-## 8. 画 human-vs-LLM preference 图
+## 8. 现场 LLM judge 并画 human-vs-LLM preference 图
 
-如果已经有 `completed_annotations_all.csv`，可以直接从 CSV 和 private key 生成 summary 与 SVG 图：
+如果已经有 `completed_annotations_all.csv`，可以直接从 CSV、private key 和 public package 生成 summary 与 SVG 图。
+这条命令会现场调用 Claude Sonnet 4.6 重新做 A/B preference judge，不读取 Step 3 eval 里的 LLM preference：
 
 ```bash
 python3 -m benchmark.human_alignment.plot_alignment \
   --annotations benchmark/data/bench_pipeline/human_alignment_pairwise/completed_annotations_all.csv \
   --key benchmark/data/bench_pipeline/human_alignment_pairwise/annotation_key.json \
-  --tie-threshold 0.25 \
   --output benchmark/data/bench_pipeline/human_alignment_pairwise/human_alignment_preference_alignment.svg
 ```
 
-如果已经先跑过汇总，也可以直接从 `human_alignment_summary.json` 画图：
+默认参数：
+
+```text
+--llm-source live
+--judge-model anthropic/claude-sonnet-4.6
+--judge-concurrency 2
+```
+
+API key、base URL 和 provider binding 默认走项目现有 LLM 基建配置，例如 OpenRouter：
+
+```bash
+export LLM_API_KEY=...
+export LLM_HOST=https://openrouter.ai/api/v1
+export LLM_BINDING=openrouter
+```
+
+如果你的环境已经在 `.env` / `DeepTutor.env` 里配好了这些变量，就不需要在命令里重复传。
+
+如果要明确指定 package、模型或并发：
+
+```bash
+python3 -m benchmark.human_alignment.plot_alignment \
+  --annotations benchmark/data/bench_pipeline/human_alignment_pairwise/completed_annotations_all.csv \
+  --key benchmark/data/bench_pipeline/human_alignment_pairwise/annotation_key.json \
+  --package benchmark/data/bench_pipeline/human_alignment_pairwise/annotation_package.jsonl \
+  --judge-model anthropic/claude-sonnet-4.6 \
+  --judge-concurrency 1 \
+  --output benchmark/data/bench_pipeline/human_alignment_pairwise/human_alignment_preference_alignment.svg
+```
+
+会额外输出：
+
+```text
+live_llm_judgments.json
+```
+
+其中保存 Claude 对每个 pair/metric 的 A/B/tie 判断和简短理由。
+
+如果已经先跑过现场 judge + summary，也可以直接从 `human_alignment_summary.json` 画图，不再调用 LLM：
 
 ```bash
 python3 -m benchmark.human_alignment.plot_alignment \
   --summary benchmark/data/bench_pipeline/human_alignment_pairwise/human_alignment_summary.json \
+  --output benchmark/data/bench_pipeline/human_alignment_pairwise/human_alignment_preference_alignment.svg
+```
+
+如果想回到旧逻辑，从 Step 3 eval 分数诱导 LLM preference：
+
+```bash
+python3 -m benchmark.human_alignment.plot_alignment \
+  --annotations benchmark/data/bench_pipeline/human_alignment_pairwise/completed_annotations_all.csv \
+  --key benchmark/data/bench_pipeline/human_alignment_pairwise/annotation_key.json \
+  --llm-source eval \
+  --tie-threshold 0.25 \
   --output benchmark/data/bench_pipeline/human_alignment_pairwise/human_alignment_preference_alignment.svg
 ```
 

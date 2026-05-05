@@ -15,6 +15,10 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from benchmark.human_alignment.common import METRIC_CODES, read_json
+from benchmark.human_alignment.live_judge import (
+    DEFAULT_JUDGE_MODEL,
+    summarize_with_live_judge,
+)
 from benchmark.human_alignment.summarize_annotations import summarize_annotations
 
 COLORS = {
@@ -193,6 +197,21 @@ def main() -> None:
     parser.add_argument("--summary", default="", help="Existing human_alignment_summary.json")
     parser.add_argument("--annotations", default="", help="Completed annotation CSV/JSONL; used when --summary is omitted")
     parser.add_argument("--key", default="", help="annotation_key.json; required with --annotations")
+    parser.add_argument("--package", default="", help="annotation_package.jsonl (default: next to key)")
+    parser.add_argument(
+        "--llm-source",
+        choices=["live", "eval"],
+        default="live",
+        help="How to obtain LLM preference when --annotations is used (default: live)",
+    )
+    parser.add_argument("--judge-model", default=DEFAULT_JUDGE_MODEL, help="Live judge model")
+    parser.add_argument("--judge-binding", default="", help="Override live judge provider binding; default uses existing LLM config")
+    parser.add_argument("--judge-base-url", default="", help="Override live judge API base URL; default uses existing LLM config")
+    parser.add_argument("--judge-api-key", default=None, help="Override live judge API key; default uses existing LLM config/env")
+    parser.add_argument("--judge-concurrency", type=int, default=2, help="Concurrent live judge calls")
+    parser.add_argument("--judge-max-tokens", type=int, default=1800, help="Max tokens per live judge response")
+    parser.add_argument("--judge-output", default="", help="Live judge JSON output")
+    parser.add_argument("--limit-pairs", type=int, default=0, help="Debug: live judge only first N annotated pairs")
     parser.add_argument("--tie-threshold", type=float, default=0.25, help="LLM score delta treated as tie")
     parser.add_argument("--output", default="", help="Output SVG path")
     parser.add_argument(
@@ -210,12 +229,30 @@ def main() -> None:
             parser.error("provide either --summary or both --annotations and --key")
         key_path = Path(args.key)
         summary_path = key_path.parent / "human_alignment_summary.json"
-        summary = summarize_annotations(
-            annotations_path=Path(args.annotations),
-            key_path=key_path,
-            output_path=summary_path,
-            tie_threshold=args.tie_threshold,
-        )
+        if args.llm_source == "live":
+            package_path = Path(args.package) if args.package else key_path.parent / "annotation_package.jsonl"
+            judge_output_path = Path(args.judge_output) if args.judge_output else key_path.parent / "live_llm_judgments.json"
+            summary = summarize_with_live_judge(
+                annotations_path=Path(args.annotations),
+                key_path=key_path,
+                package_path=package_path,
+                summary_output_path=summary_path,
+                judge_output_path=judge_output_path,
+                model=args.judge_model,
+                binding=args.judge_binding or None,
+                base_url=args.judge_base_url or None,
+                api_key=args.judge_api_key,
+                concurrency=args.judge_concurrency,
+                max_tokens=args.judge_max_tokens,
+                limit_pairs=args.limit_pairs,
+            )
+        else:
+            summary = summarize_annotations(
+                annotations_path=Path(args.annotations),
+                key_path=key_path,
+                output_path=summary_path,
+                tie_threshold=args.tie_threshold,
+            )
 
     output_path = Path(args.output) if args.output else Path(summary_path).with_name("human_alignment_preference_alignment.svg")
     output_path.parent.mkdir(parents=True, exist_ok=True)

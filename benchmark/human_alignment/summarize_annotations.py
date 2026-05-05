@@ -214,6 +214,8 @@ def summarize_annotations(
     key_path: Path,
     output_path: Path,
     tie_threshold: float = 0.25,
+    live_llm_preferences: dict[str, dict[str, str]] | None = None,
+    judge_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     key_by_pair = _load_key(key_path)
     rows = _load_annotations(annotations_path)
@@ -247,8 +249,13 @@ def summarize_annotations(
         for code in METRIC_CODES:
             human_side = _majority(human_votes[pair_id].get(code, []))
             human_backend = _side_to_backend_pref(human_side, key)
-            llm_side = _llm_side_preference(scores_a.get(code), scores_b.get(code), tie_threshold)
-            llm_backend = _side_to_backend_pref(llm_side, key)
+            live_backend = (live_llm_preferences or {}).get(pair_id, {}).get(code)
+            if live_backend in {"target", "baseline", "tie"}:
+                llm_side = None
+                llm_backend = live_backend
+            else:
+                llm_side = _llm_side_preference(scores_a.get(code), scores_b.get(code), tie_threshold)
+                llm_backend = _side_to_backend_pref(llm_side, key)
             metric_records[code] = {
                 "human_side_preference": human_side,
                 "human_backend_preference": human_backend,
@@ -362,6 +369,8 @@ def summarize_annotations(
         "num_annotation_rows": len(rows),
         "num_pairs_with_human_labels": len(pair_records),
         "num_raters": len(raters),
+        "llm_preference_source": "live_judge" if live_llm_preferences is not None else "step3_eval",
+        "judge_metadata": judge_metadata or {},
         "metrics": metric_summary,
         "inter_rater": inter_rater,
         "pairs": pair_records,

@@ -67,6 +67,9 @@ Open your browser at `http://localhost:7860`.
 > and `OPENAI_API_KEY=ollama` in `.env`. I've been using `llama3.1:8b` for most testing and it
 > works well enough for single-paper Q&A, though the knowledge graph quality drops noticeably
 > compared to GPT-4o.
+>
+> **Note:** I've also had good results with `mistral:7b` via Ollama for shorter documents — it's
+> noticeably faster than llama3.1:8b on my machine and the Q&A accuracy is comparable.
 
 ### Running with Docker
 
@@ -104,13 +107,4 @@ DeepTutor/
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our [contributing guidelines](.github/pull_request_template.md) and open an issue before submitting a pull request.
-
-## 📄 License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
-## 🙏 Acknowledgements
-
-- Original project: [HKUDS/DeepTutor](https://github.com/HKUDS/DeepTutor)
-- Built with [LightRA
+Contributions are welcome! Please read our [contrib

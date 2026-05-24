@@ -59,6 +59,9 @@ Open your browser at `http://localhost:7860`.
 >
 > Also setting `GRADIO_SERVER_PORT=7861` avoids conflicts if you already have another Gradio app
 > running on the default port.
+>
+> If the knowledge graph step feels slow on first document load, try setting `MAX_ASYNC=4` in `.env`
+> to limit concurrent LLM calls — helps avoid rate-limit errors on free-tier API keys.
 
 ### Running with Docker
 

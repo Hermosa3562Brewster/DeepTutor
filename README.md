@@ -56,6 +56,9 @@ Open your browser at `http://localhost:7860`.
 
 > **Personal note:** I've found it useful to set `GRADIO_SERVER_NAME=0.0.0.0` in `.env` when running
 > inside a dev container or WSL2, so the UI is reachable from the host browser.
+>
+> Also setting `GRADIO_SERVER_PORT=7861` avoids conflicts if you already have another Gradio app
+> running on the default port.
 
 ### Running with Docker
 

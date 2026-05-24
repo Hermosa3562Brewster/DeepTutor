@@ -62,6 +62,11 @@ Open your browser at `http://localhost:7860`.
 >
 > If the knowledge graph step feels slow on first document load, try setting `MAX_ASYNC=4` in `.env`
 > to limit concurrent LLM calls — helps avoid rate-limit errors on free-tier API keys.
+>
+> **Tip:** If you're using Ollama locally instead of OpenAI, set `OPENAI_API_BASE=http://localhost:11434/v1`
+> and `OPENAI_API_KEY=ollama` in `.env`. I've been using `llama3.1:8b` for most testing and it
+> works well enough for single-paper Q&A, though the knowledge graph quality drops noticeably
+> compared to GPT-4o.
 
 ### Running with Docker
 
@@ -108,4 +113,4 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 ## 🙏 Acknowledgements
 
 - Original project: [HKUDS/DeepTutor](https://github.com/HKUDS/DeepTutor)
-- Built with [LightRAG](https://github.com/HKUDS/LightRAG), [Gradio](https://gradio.app/), and [LangChain](https://langchain.com/)
+- Built with [LightRA

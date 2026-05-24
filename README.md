@@ -54,6 +54,9 @@ python app.py
 
 Open your browser at `http://localhost:7860`.
 
+> **Personal note:** I've found it useful to set `GRADIO_SERVER_NAME=0.0.0.0` in `.env` when running
+> inside a dev container or WSL2, so the UI is reachable from the host browser.
+
 ### Running with Docker
 
 ```bash

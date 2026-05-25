@@ -88,20 +88,8 @@ docker run -p 7860:7860 --env-file .env deeptutor
 ```bash
 # Install dev dependencies
 pip install -r requirements-dev.txt
-
-# Run tests
-pytest tests/
-
-# Lint
-ruff check .
 ```
 
-## 📁 Project Structure
-
-```
-DeepTutor/
-├── app.py                  # Main application entry point
-├── core/                   # Core logic (RAG pipeline, LLM clients)
-├── ui/                     # Gradio / frontend components
-├── utils/                  # 
-```
+> **Note:** The original README had a typo here (`requirements` instead of `requirements-dev.txt`).
+> Fixed for clarity — make sure `requirements-dev.txt` exists or adjust to match whatever dev
+> deps file is actually present in the repo.

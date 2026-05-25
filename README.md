@@ -70,6 +70,11 @@ Open your browser at `http://localhost:7860`.
 >
 > **Note:** I've also had good results with `mistral:7b` via Ollama for shorter documents — it's
 > noticeably faster than llama3.1:8b on my machine and the Q&A accuracy is comparable.
+>
+> **Note:** `qwen2.5:7b` via Ollama has been even better in my recent testing — noticeably stronger
+> at following the structured output format the knowledge graph pipeline expects, which means fewer
+> parse errors and more complete graphs. Worth trying if `mistral:7b` gives you malformed JSON in
+> the graph step.
 
 ### Running with Docker
 
@@ -98,13 +103,5 @@ DeepTutor/
 ├── app.py                  # Main application entry point
 ├── core/                   # Core logic (RAG pipeline, LLM clients)
 ├── ui/                     # Gradio / frontend components
-├── utils/                  # Shared utilities
-├── tests/                  # Test suite
-├── Dockerfile
-├── requirements.txt
-└── .env.example
+├── utils/                  # 
 ```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our [contrib
